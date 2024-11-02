@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/ProtectedRoute.tsx","./src/main.tsx","./src/songs.ts","./src/vite-env.d.ts","./src/components/CustomMusicPlayer.tsx","./src/components/Layout.tsx","./src/components/Navbar.tsx","./src/components/SongCard.tsx","./src/pages/CustomMusicPlayerPage.tsx","./src/utils/pkce.ts"],"version":"5.6.3"}

@@ -1,5 +1,6 @@
 // src/components/SongCard.tsx
 import React from "react";
+import { Song } from "../songs";
 
 interface SongCardProps {
   song: Song;

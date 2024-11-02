@@ -2,22 +2,11 @@
 
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import {
-  HomeIcon,
-  UserIcon,
-  Cog6ToothIcon,
-  MusicalNoteIcon,
-  ArrowRightOnRectangleIcon,
-} from "@heroicons/react/24/outline";
+import { HomeIcon } from "@heroicons/react/24/outline";
 
 const Navbar: React.FC = () => {
   const location = useLocation();
   const showNavbar = location.pathname !== "/login";
-
-  const handleLogout = () => {
-    localStorage.removeItem("spotify_access_token");
-    window.location.href = "/login";
-  };
 
   return (
     <>

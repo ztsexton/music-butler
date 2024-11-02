@@ -22,3 +22,5 @@ const songs: Song[] = [
 ];
 
 export default songs;
+
+export type { Song };

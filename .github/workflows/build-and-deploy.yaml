@@ -1,0 +1,107 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18.x'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Lint
+      run: npm run lint
+      
+    - name: Build project
+      run: npm run build
+    
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: production-build
+        path: dist
+        retention-days: 7
+        if-no-files-found: error
+
+  deploy:
+    needs: lint-and-build
+    if: (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')) || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    env:
+      SERVER_HOST: ${{ secrets.SSH_HOST }}
+      SERVER_USER: ${{ secrets.SSH_USER }}
+      TARGET_PATH: ${{ secrets.DEPLOY_PATH }}
+    
+    steps:
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: production-build
+        path: dist
+
+    - name: Create .htaccess for SPA routing in subdirectory
+      run: |
+        cat > dist/.htaccess << 'EOL'
+        <IfModule mod_rewrite.c>
+          RewriteEngine On
+          RewriteBase /music-butler/
+          RewriteRule ^index\.html$ - [L]
+          RewriteCond %{REQUEST_FILENAME} !-f
+          RewriteCond %{REQUEST_FILENAME} !-d
+          RewriteRule . /music-butler/index.html [L]
+        </IfModule>
+        EOL
+
+    - name: Setup SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+        chmod 600 ~/.ssh/deploy_key
+
+    - name: Add server to known hosts
+      run: |
+        ssh-keyscan -H "$SERVER_HOST" >> ~/.ssh/known_hosts 2>/dev/null || { 
+          echo "Failed to get SSH fingerprint"
+          exit 1
+        }
+
+    - name: Test SSH connection
+      run: |
+        if ! ssh -i ~/.ssh/deploy_key -o ConnectTimeout=10 "$SERVER_USER@$SERVER_HOST" "echo 'Connection successful'"; then
+          echo "Failed to connect to server"
+          exit 1
+        fi
+        echo "✅ SSH connection successful"
+    
+    - name: Deploy with rsync
+      run: |
+        rsync -azhP --delete --stats --compress --compress-level=9 --timeout=60 --exclude=".git*" \
+          -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10" \
+          dist/ "$SERVER_USER@$SERVER_HOST:$TARGET_PATH" || { 
+            echo "❌ Deployment failed"
+            exit 1
+          }
+        echo "🚀 Deployment successful to $SERVER_HOST:$TARGET_PATH"
+
+    - name: Cleanup SSH key
+      if: always()
+      run: rm -f ~/.ssh/deploy_key

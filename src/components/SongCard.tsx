@@ -15,7 +15,7 @@ interface SongCardProps {
  */
 const SongCard: React.FC<SongCardProps> = ({ song, onSelect, isSelected }) => (
   <div
-    className={`p-4 border rounded-md cursor-pointer transition-colors duration-200 hover:bg-gray-50 ${
+    className={`p-4 border rounded-md cursor-pointer transition-colors duration-200 hover:bg-gray-50 w-64 ${
       isSelected ? "border-blue-500 bg-blue-50" : "border-gray-300"
     }`}
     onClick={() => onSelect(song)}

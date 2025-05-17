@@ -3,11 +3,15 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - master # Change this if you’re deploying from a different branch
+      - master
+    tags:
+      - 'v*' # This will trigger the workflow when a tag matching v* is pushed
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    # Only run the deployment job if a tag was pushed
+    if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
       - name: Check out the code

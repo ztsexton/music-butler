@@ -4,12 +4,24 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 
 interface ProtectedRouteProps {
-  element: JSX.Element;
+  children: React.ReactNode;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element }) => {
-  const accessToken = localStorage.getItem('spotify_access_token');
-  return accessToken ? element : <Navigate to="/login" replace />;
+/**
+ * A wrapper component that protects routes by checking if the user is authenticated.
+ * Redirects to login if not authenticated.
+ */
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
+  // This is a placeholder for actual authentication logic
+  // You would typically check a token in localStorage or use an auth context
+  const isAuthenticated = localStorage.getItem('authToken') !== null;
+
+  if (!isAuthenticated) {
+    // Redirect to login page if not authenticated
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 export default ProtectedRoute;

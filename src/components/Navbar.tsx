@@ -1,32 +1,26 @@
 // src/components/Navbar.tsx
 
-import React from "react";
-import { NavLink, useLocation } from "react-router-dom";
-import { HomeIcon } from "@heroicons/react/24/outline";
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
-  const location = useLocation();
-  const showNavbar = location.pathname !== "/login";
-
   return (
-    <>
-      {showNavbar && (
-        <nav className="bg-gray-800 shadow">
-          <div className="container mx-auto px-6 py-3 flex items-center justify-between">
-            {/* Left Side - Logo and Navigation Links */}
-            <div className="flex items-center space-x-6">
-              <NavLink
-                to="/"
-                className="text-white text-2xl font-bold flex items-center"
-              >
-                <HomeIcon className="h-6 w-6 mr-2" />
-                Music Butler
-              </NavLink>
-            </div>
+    <nav className="bg-blue-600 text-white shadow-md">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex justify-between items-center">
+          <Link to="/" className="text-xl font-bold">Music Butler</Link>
+          <div className="space-x-4">
+            <Link to="/" className="hover:text-blue-200 transition-colors">
+              Home
+            </Link>
+            {/* Add more navigation links as your app grows */}
+            {/* <Link to="/playlists" className="hover:text-blue-200 transition-colors">
+              Playlists
+            </Link> */}
           </div>
-        </nav>
-      )}
-    </>
+        </div>
+      </div>
+    </nav>
   );
 };
 

@@ -1,5 +1,5 @@
 {
-  "homepage": "ztsexton>.github.io/music-butler",
+  "homepage": "https://ztsexton.github.io/music-butler",
   "name": "music-butler",
   "private": true,
   "version": "0.0.0",
@@ -7,10 +7,13 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@heroicons/react": "^2.1.5",
